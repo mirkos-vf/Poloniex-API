@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Poloniex-API.t
+lib/Poloniex/API.pm
