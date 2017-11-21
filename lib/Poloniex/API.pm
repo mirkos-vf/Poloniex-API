@@ -69,9 +69,8 @@ sub api_public {
   }
 
   my $params;
-  if (@request) {
-    $params = sprintf "$method&%s", join('&',@request);
-  }
+  $params = sprintf "$method&%s", join('&',@request)
+    if (@request);
 
   my $requst = $self->_lwp_agent->get(
     sprintf($self->URL_PUBLIC_API, ($params) ? $params : $method));
@@ -97,8 +96,6 @@ sub _croak ($) {
   require Carp;
   Carp::croak(@ARG);
 }
-
-
 
 1;
 
