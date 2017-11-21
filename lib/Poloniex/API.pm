@@ -11,10 +11,8 @@ use LWP::UserAgent;
 use HTTP::Request;
 use JSON::XS;
 
-use constant {
-  URL_PUBLIC_API  => "https://poloniex.com/public?command=%s",
-  URL_TRADING_API => "https://poloniex.com/tradingApi"
-};
+use constant URL_PUBLIC_API  => "https://poloniex.com/public?command=%s";
+use constant URL_TRADING_API => "https://poloniex.com/tradingApi";
 
 # singleton and accessor
 {
@@ -34,55 +32,59 @@ sub new {
   return bless $object, $class;
 }
 
-sub AUTOLOAD {
-  my $self = shift;
-  our $AUTOLOAD;
-  (my $method = $AUTOLOAD) =~ s/.*:://;
-  $self->api_request ($method, @ARG);
+sub api_trading {
+  my ( $self, $method, $req ) = @ARG;
+  $$req{nonce} = time() =~ s/\.//r;
+  $$req{command} = $method;
+
+  my @post_data;
+  for ( keys %{$req}) {
+    push @post_data, "$_=$$req{$_}"
+  }
+
+  my $param = join('&', @post_data);
+  my $sign = hmac_sha512_hex( $param, $self->{Secret});
+  my %header = (
+    Key  => $self->{APIKey},
+    Sign => $sign
+  );
+  my $http = HTTP::Request->new('POST', URL_TRADING_API);
+
+  $http->content_type('application/x-www-form-urlencoded');
+  $http->header(%header);
+  $http->content($param);
+  my $respons = $self->_lwp_agent->request($http);
+
+  my $json = $self->_retrieve_json($respons->{'_content'});
+
+  return wantarray ? ($json, $self->error($respons->{'_content'})) : $json;
 }
 
-sub api_request {
-  my ( $self, $method ) = splice @ARG, 0, 2;
+sub api_public {
+  my ( $self, $method, $req )= @_;
 
-  Carp::croak("new() requires key-value pairs")
-    unless @ARG % 2 == 0;
-
-  my (@query, $key, $values);
-  while (@ARG) {
-    $key    = shift @ARG;
-    $values = shift @ARG;
-    push @query, "$key=$values";
+  my @request;
+  for my $value ( keys %{$req} ) {
+    push @request, "$value=$$req{$value}";
   }
 
-  my $requst;
-  if ( $self->{type_url} eq 'public') {
-    $requst = $self->_lwp_agent->get(
-      sprintf URL_PUBLIC_API, $method
-    );
+  my $params;
+  if (@request) {
+    $params = sprintf "$method&%s", join('&',@request);
   }
-  elsif ($self->{type_url} eq 'trading') {
-    my $nonce = time() =~ s/\.//r;
-    my $params = "nonce=$nonce&command=$method";
-    if (@query) {
-      $params .= '&' . _prepair_params(@query)
-    }
-    my $req = HTTP::Request->new( 'POST', URL_TRADING_API );
 
-    $req->content_type('application/x-www-form-urlencoded');
-    $req->header( Key  => $self->{APIKey} );
-    $req->header( Sign => hmac_sha512_hex( $params, $self->{Secret}) );
-    $req->content( $params );
-    $self->_lwp_agent->agent("Mozilla/5.0 (Windows NT 6.3; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0");
-    $requst = $self->_lwp_agent->request($req);
-  }
-  return $self->_retrieve_json($requst->{_content});
+  my $requst = $self->_lwp_agent->get(
+    sprintf($self->URL_PUBLIC_API, ($params) ? $params : $method));
+  my $json = $self->_retrieve_json($requst->{'_content'});
+  return wantarray ? ($json, $self->error($requst->{'_content'})) : $json;
 }
 
-sub public  { shift->{type_url} = 'public' }
-sub trading { shift->{type_url} = 'trading'}
+sub error {
+  my ($self, $requst) = @ARG;
 
-sub _prepair_params {
-  return join ( '&', @ARG );
+  my $msg = ($requst =~ m{"error":"([^"])*"}igm);
+  return unless defined $msg;
+  return $msg;
 }
 
 sub _retrieve_json {
@@ -95,6 +97,8 @@ sub _croak ($) {
   require Carp;
   Carp::croak(@ARG);
 }
+
+
 
 1;
 
