@@ -12,8 +12,8 @@ https://poloniex.com/support/api/
 	use Poloniex::API; 
 	
 	my $api = Poloniex::API->new(
-		APIKey => '3318B9SG-8UXSJ3VW-LG25QCU4-FHFDLPNF',
-		Secret => '6cea63996301a82821ad5d0b1026a7f5a8fsd76748ab7058005f96f3f8df1fc9074e1ba785c2b6a8ede6ff691a253e64cb55b478c7ba56edd26e74d83005b76c9c'
+		APIKey => 'your-api-key',
+		Secret => 'your-secret-key'
 	);
 ```
 
