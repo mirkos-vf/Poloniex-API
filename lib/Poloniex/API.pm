@@ -92,7 +92,7 @@ sub _retrieve_json {
   return $self->{json}->utf8(1)->decode($data);
 }
 
-sub _croak ($) {
+sub _croak {
   require Carp;
   Carp::croak(@ARG);
 }
