@@ -102,3 +102,71 @@ sub _croak {
 
 __END__
 
+# Below is stub documentation for your module. You'd better edit it!
+
+=head1 NAME
+
+    Poloniex::API - Poloniex API wrapper.
+
+=head1 SYNOPSIS
+
+	use Poloniex::API; 
+	
+	my $api = Poloniex::API->new(
+		APIKey => 'your-api-key',
+		Secret => 'your-secret-key'
+	);
+
+=head1 DESCRIPTION
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+    my $iterator = Poloniex::API->new(%hash);
+    Return a Poloniex::API for C<hash>
+
+=head1 METHODS
+
+=over
+
+=back
+
+=head2 api_trading
+
+    my $returnCompleteBalances = $api->api_trading('returnCompleteBalances');
+	my ($returnTradeHistory, $err) = $api->api_trading('returnTradeHistory', {
+		currencyPair => 'BTC_ZEC'
+	});
+	
+	if ($err) {
+		say $returnTradeHistory->{error};
+	}
+TODO: this description function
+
+=head2 api_public
+
+	my $Ticker = $api->api_public('returnTicker');
+	
+	my $ChartData    = $api->api_public('returnChartData', {
+		currencyPair => 'BTC_XMR',
+		start        => 1405699200,
+		end          => 9999999999,
+		period       => 14400
+	});
+TODO: this description function
+
+=head1 AUTHOR
+
+vlad mirkos, E<lt>vladmirkos@sd.apple.com<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by vlad mirkos
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=encoding UTF-8
+
+=cut
