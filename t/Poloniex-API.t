@@ -9,7 +9,17 @@ use strict;
 use warnings;
 
 use Test::More tests => 1;
-BEGIN { use_ok('Poloniex::API') };
+
+BEGIN {
+    use_ok('Poloniex::API');
+    eval { use Test::MockObject; 1 }
+      || plan skip_all => 'Poloniex::API required for this test!';
+}
+
+my $api = Poloniex::API->new(
+    APIKey => 'YOUR-API-KEY-POLONIEX',
+    Secret => 'YOUR-SECRET-KEY-POLONIEX'
+);
 
 #########################
 

@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use English;
 use File::Spec;
 use Test::More;
 use Cwd;
@@ -14,7 +15,7 @@ if ( not $ENV{TEST_AUTHOR} ) {
 
 eval { require Test::Perl::Critic; };
 
-if ($@) {
+if ($EVAL_ERROR) {
     my $msg = 'Test::Perl::Critic required to criticise code';
     plan( skip_all => $msg );
 }

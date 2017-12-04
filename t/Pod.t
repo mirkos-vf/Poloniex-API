@@ -1,10 +1,11 @@
 use strict;
 use warnings;
+use English;
 use Test::More;
 
-eval "use Test::Pod 1.00";
+eval {use Test::Pod 1.00};
 
-if ($@) {
+if ($EVAL_ERROR) {
     plan skip_all => "Test::Pod 1.00 required for testing POD";
 }
 my @poddirs = qw( lib );

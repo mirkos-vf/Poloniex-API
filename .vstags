@@ -1,0 +1,26 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Poloniex::API	blib/lib/Poloniex/API.pm	3;"	p
+Poloniex::API	lib/Poloniex/API.pm	3;"	p
+URL_PUBLIC_API	blib/lib/Poloniex/API.pm	14;"	c
+URL_PUBLIC_API	lib/Poloniex/API.pm	14;"	c
+URL_TRADING_API	blib/lib/Poloniex/API.pm	15;"	c
+URL_TRADING_API	lib/Poloniex/API.pm	15;"	c
+_croak	blib/lib/Poloniex/API.pm	96;"	s
+_croak	lib/Poloniex/API.pm	96;"	s
+_lwp_agent	blib/lib/Poloniex/API.pm	21;"	s
+_lwp_agent	lib/Poloniex/API.pm	21;"	s
+_retrieve_json	blib/lib/Poloniex/API.pm	90;"	s
+_retrieve_json	lib/Poloniex/API.pm	90;"	s
+api_public	blib/lib/Poloniex/API.pm	64;"	s
+api_public	lib/Poloniex/API.pm	64;"	s
+api_trading	blib/lib/Poloniex/API.pm	35;"	s
+api_trading	lib/Poloniex/API.pm	35;"	s
+error	blib/lib/Poloniex/API.pm	82;"	s
+error	lib/Poloniex/API.pm	82;"	s
+new	blib/lib/Poloniex/API.pm	24;"	s
+new	lib/Poloniex/API.pm	24;"	s
