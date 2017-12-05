@@ -9,9 +9,6 @@ use strict;
 use warnings;
 use JSON::MaybeXS qw(encode_json decode_json);
 use Test::More qw(no_plan);
-
-use FindBin qw($Bin);
-use lib "$Bin/../lib";
 use Poloniex::API;
 
 BEGIN {
