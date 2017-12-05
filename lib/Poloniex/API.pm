@@ -128,7 +128,9 @@ __END__
 	);
 
 =head1 DESCRIPTION
+    Poloniex API wrapper for perl
 
+    API DOCUMENTATION https://poloniex.com/support/api/
 =head1 CONSTRUCTORS
 
 =head2 new
