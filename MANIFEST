@@ -1,6 +1,9 @@
 Changes
 Makefile.PL
 MANIFEST
-README
+README.md
 t/Poloniex-API.t
+t/Critic.t
+t/Pod.t
+t/Tidy.t
 lib/Poloniex/API.pm

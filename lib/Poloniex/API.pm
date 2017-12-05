@@ -11,12 +11,18 @@ use LWP::UserAgent;
 use HTTP::Request;
 use JSON::XS;
 
-use constant URL_PUBLIC_API  => "https://poloniex.com/public?command=%s";
-use constant URL_TRADING_API => "https://poloniex.com/tradingApi";
+use constant {
+    URL_PUBLIC_API     => "https://poloniex.com/public?command=%s",
+    URL_TRADING_API    => "https://poloniex.com/tradingApi",
+    DEBUG_API_POLONIEX => $ENV{DEBUG_API_POLONIEX} || undef,
+};
+
+our $VERSION = '0.001';
 
 # singleton and accessor
 {
-    eval { require LWP::UserAgent };
+    eval { require LWP::UserAgent, 1; }
+      || _croak('LWP::UserAgent package not found');
     my $lwp = LWP::UserAgent->new();
     sub _lwp_agent { return $lwp }
 }
@@ -28,6 +34,7 @@ sub new {
     $object->{APIKey} = $options{APIKey} || undef;
     $object->{Secret} = $options{Secret} || undef;
     $object->{json}   = JSON::XS->new;
+    $object->{_agent} = _lwp_agent;
 
     return bless $object, $class;
 }
@@ -48,12 +55,12 @@ sub api_trading {
         Key  => $self->{APIKey},
         Sign => $sign
     );
-    my $http = HTTP::Request->new( 'POST', URL_TRADING_API );
+    my $http = HTTP::Request->new( 'POST', $self->URL_TRADING_API );
 
     $http->content_type('application/x-www-form-urlencoded');
     $http->header(%header);
     $http->content($param);
-    my $respons = $self->_lwp_agent->request($http);
+    my $respons = $self->{_agent}->request($http);
 
     my $json = $self->_retrieve_json( $respons->{'_content'} );
 
@@ -62,21 +69,24 @@ sub api_trading {
 }
 
 sub api_public {
-    my ( $self, $method, $req ) = @_;
+    my ( $self, $method, $req ) = @ARG;
 
     my @request;
     for my $value ( keys %{$req} ) {
         push @request, "$value=$$req{$value}";
     }
 
-    my $params;
+    my ( $params, $json );
     $params = sprintf "$method&%s", join( '&', @request )
       if (@request);
 
-    my $requst = $self->_lwp_agent->get(
-        sprintf( $self->URL_PUBLIC_API, ($params) ? $params : $method ) );
-    my $json = $self->_retrieve_json( $requst->{'_content'} );
-    return wantarray ? ( $json, $self->error( $requst->{'_content'} ) ) : $json;
+    my $requst = $self->{_agent}
+      ->get( sprintf( URL_PUBLIC_API, ($params) ? $params : $method ) );
+    if ( $requst->is_success ) {
+        $json = $self->_retrieve_json( $requst->decoded_content );
+    }
+
+    return $json;
 }
 
 sub error {
