@@ -7,7 +7,7 @@
 
 use strict;
 use warnings;
-use JSON::MaybeXS qw(encode_json);
+use JSON::MaybeXS qw(encode_json decode_json);
 use Test::More qw(no_plan);
 
 use FindBin qw($Bin);
@@ -22,15 +22,75 @@ BEGIN {
 
 my @test = (
     {
-        agent  => \&lwp_mock,
-        resp   => { result => 'returnTicker' },
+        agent => \&lwp_mock,
+        resp  => {
+            result =>
+'{"BTC_LTC":{"last":"0.0251","lowestAsk":"0.02589999","highestBid":"0.0251","percentChange":"0.02390438", "baseVolume":"6.16485315","quoteVolume":"245.82513926"}}',
+        },
         method => 'returnTicker',
     },
     {
-        agent        => \&lwp_mock,
-        resp         => { result => 'tereturnOrderBookst' },
-        method       => 'returnOrderBook',
-        request_args => { currencyPair => 'BTC_ZEC', depth => 10 },
+        agent => \&lwp_mock,
+        resp  => {
+            result =>
+'{"BTC_LTC":{"BTC":"2.23248854","LTC":"87.10381314"},"BTC_NXT":{"BTC":"0.981616","NXT":"14145"}, "totalBTC":"81.89657704","totalLTC":"78.52083806"}'
+        },
+        method => 'return24Volume',
+    },
+    {
+        agent => \&lwp_mock,
+        resp  => {
+            result =>
+'{"asks":[[0.00007600,1164],[0.00007620,1300] ], "bids":[[0.00006901,200],[0.00006900,408] ], "isFrozen": 0, "seq": 18849}'
+        },
+        method => 'returnOrderBook',
+    },
+    {
+        agent => \&lwp_mock,
+        resp  => {
+            result =>
+'[{"date":"2014-02-10 04:23:23","type":"buy","rate":"0.00007600","amount":"140","total":"0.01064"},{"date":"2014-02-10 01:19:37","type":"buy","rate":"0.00007600","amount":"655","total":"0.04978"}]'
+        },
+        method => 'returnTradeHistory',
+        request_args =>
+          { currencyPair => 'BTC_NXT', start => 1410158341, end => 1410499372 },
+    },
+    {
+        agent => \&lwp_mock,
+        resp  => {
+            result =>
+'[{"date":1405699200,"high":0.0045388,"low":0.00403001,"open":0.00404545,"close":0.00427592,"volume":44.11655644, "quoteVolume":10259.29079097,"weightedAverage":0.00430015}]'
+        },
+        method       => 'returnChartData',
+        request_args => {
+            currencyPair => 'BTC_XMR',
+            start        => 1405699200,
+            end          => 9999999999,
+            period       => 14400
+        },
+    },
+    {
+        agent => \&lwp_mock,
+        resp  => {
+            result =>
+'{"1CR":{"maxDailyWithdrawal":10000,"txFee":0.01,"minConf":3,"disabled":0},"ABY":{"maxDailyWithdrawal":10000000,"txFee":0.01,"minConf":8,"disabled":0}}'
+        },
+        method => 'returnCurrencies',
+    },
+    {
+        agent => \&lwp_mock,
+        resp  => {
+            result =>
+'{"offers":[{"rate":"0.00200000","amount":"64.66305732","rangeMin":2,"rangeMax":8} ],"demands":[{"rate":"0.00170000","amount":"26.54848841","rangeMin":2,"rangeMax":2} ]}'
+        },
+        method       => 'returnLoanOrders',
+        request_args => { currency => 'BTC' }
+    },
+    # fail
+    {
+        agent => \&lwp_mock,
+        resp => { result => '{"error":"error message"}' },
+        method => 'fail'
     }
 );
 
@@ -50,7 +110,7 @@ foreach my $test (@test) {
     my $mock_tester = sub {
         my $return_value = shift;
 
-        is_deeply $return_value, $test->{resp},
+        is_deeply $return_value, decode_json($test->{resp}->{result}),
           "return value of '$method' is as expected";
     };
     note("running tests for $test->{method}");
@@ -63,11 +123,11 @@ sub lwp_mock {
     my $mock_response = Test::MockObject->new;
 
     $mock_response->set_true('is_success');
-    $mock_response->set_always( 'decoded_content', encode_json($response) );
+    $mock_response->set_always( 'decoded_content', $response->{result} );
 
     my $mock_agent = Test::MockObject->new;
 
-    $mock_agent->set_always( 'get', $mock_response );
+    $mock_agent->set_always( 'post', $mock_response );
     $mock_agent->set_isa('LWP::UserAgent');
 
     ( $mock_agent, $mock_response, 'decoded_content', 'is_success' );

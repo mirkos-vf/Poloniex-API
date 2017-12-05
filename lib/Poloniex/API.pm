@@ -81,7 +81,7 @@ sub api_public {
       if (@request);
 
     my $requst = $self->{_agent}
-      ->get( sprintf( URL_PUBLIC_API, ($params) ? $params : $method ) );
+      ->post( sprintf( URL_PUBLIC_API, ($params) ? $params : $method ) );
     if ( $requst->is_success ) {
         $json = $self->_retrieve_json( $requst->decoded_content );
     }
