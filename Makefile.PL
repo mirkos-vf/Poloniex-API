@@ -18,11 +18,7 @@ WriteMakefile(
         : ()
     ),
     PREREQ_PM => {
-        'Test::More'         => 0,
-        'Test::Pod'          => 0,
-        'Test::Perl::Critic' => 0,
-        'Test::PerlTidy'     => 0,
-        'Test::MockObject'   => 0
+        map { $_ => 0 } qw(JSON::XS Test::MockObject HTTP::Request Digest::SHA),
     },
     META_MERGE => {
         requires  => { perl => 'v5.22' },

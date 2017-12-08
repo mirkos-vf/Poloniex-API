@@ -3,28 +3,34 @@ use utf8;
 package Poloniex::API;
 
 use Time::HiRes qw(time);
-use English;
+use English qw( -no_match_vars );
 use strict;
 use warnings;
 use Digest::SHA qw(hmac_sha512_hex);
-use LWP::UserAgent;
 use HTTP::Request;
-use JSON::XS;
 
 use constant {
     URL_PUBLIC_API     => "https://poloniex.com/public?command=%s",
     URL_TRADING_API    => "https://poloniex.com/tradingApi",
-    DEBUG_API_POLONIEX => $ENV{DEBUG_API_POLONIEX} || undef,
+    DEBUG_API_POLONIEX => $ENV{DEBUG_API_POLONIEX} || 0,
 };
 
+BEGIN {
+    eval { require LWP::UserAgent, 1; }
+      || _croak('LWP::UserAgent package not found');
+
+    eval { require JSON::XS, 1; }
+      || _croak('JSON::XS package not found');
+}
 our $VERSION = '0.001';
 
 # singleton and accessor
 {
-    eval { require LWP::UserAgent, 1; }
-      || _croak('LWP::UserAgent package not found');
     my $lwp = LWP::UserAgent->new();
     sub _lwp_agent { return $lwp }
+
+    my $json = JSON::XS->new();
+    sub _json { return $json }
 }
 
 sub new {
@@ -33,7 +39,7 @@ sub new {
 
     $object->{APIKey} = $options{APIKey} || undef;
     $object->{Secret} = $options{Secret} || undef;
-    $object->{json}   = JSON::XS->new;
+    $object->{_json}  = _json;
     $object->{_agent} = _lwp_agent;
 
     return bless $object, $class;
@@ -63,9 +69,7 @@ sub api_trading {
     my $respons = $self->{_agent}->request($http);
 
     my $json = $self->_retrieve_json( $respons->{'_content'} );
-
-    return
-      wantarray ? ( $json, $self->error( $respons->{'_content'} ) ) : $json;
+    return $json;
 }
 
 sub api_public {
@@ -82,25 +86,37 @@ sub api_public {
 
     my $requst = $self->{_agent}
       ->post( sprintf( URL_PUBLIC_API, ($params) ? $params : $method ) );
-    if ( $requst->is_success ) {
-        $json = $self->_retrieve_json( $requst->decoded_content );
-    }
 
-    return $json;
+    if (   ( $requst->is_success )
+        && ( !$self->parse_error( $requst->decoded_content ) ) )
+    {
+        return $json = $self->_retrieve_json( $requst->decoded_content );
+    }
 }
 
-sub error {
-    my ( $self, $requst ) = @ARG;
+=head1 parse_error
 
-    my $msg = ( $requst =~ m{"error":"([^"])*"}igm );
-    return unless defined $msg;
-    return $msg;
+    method parse_error return vakue undef
+    if not error
+
+=cut
+
+sub parse_error {
+    my ( $self, $msg ) = @ARG;
+    my $error = { type => 'unknown', $msg => $msg || $EVAL_ERROR };
+
+    return
+      unless $error->{msg} =~ m/"error":"(?<MSG_ERROR>[^"]*)"/;
+
+    $self->{msg} = $LAST_PAREN_MATCH{MSG_ERROR};
+    $self->{type} = 'api';
+
 }
 
 sub _retrieve_json {
     my ( $self, $data ) = @ARG;
 
-    return $self->{json}->utf8(1)->decode($data);
+    return $self->{_json}->utf8(1)->decode($data);
 }
 
 sub _croak {
@@ -128,9 +144,9 @@ __END__
 	);
 
 =head1 DESCRIPTION
-    Poloniex API wrapper for perl
 
     API DOCUMENTATION https://poloniex.com/support/api/
+
 =head1 CONSTRUCTORS
 
 =head2 new
@@ -147,13 +163,13 @@ __END__
 =head2 api_trading
 
     my $returnCompleteBalances = $api->api_trading('returnCompleteBalances');
-	my ($returnTradeHistory, $err) = $api->api_trading('returnTradeHistory', {
-		currencyPair => 'BTC_ZEC'
-	});
-	
-	if ($err) {
-		say $returnTradeHistory->{error};
-	}
+    my ($returnTradeHistory, $err) = $api->api_trading('returnTradeHistory', {
+        currencyPair => 'BTC_ZEC'
+    });
+
+    if ($err) {
+        say $returnTradeHistory->{error};
+    }
 TODO: this description function
 
 =head2 api_public

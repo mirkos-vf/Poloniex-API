@@ -7,7 +7,6 @@
 
 use strict;
 use warnings;
-use JSON::MaybeXS qw(encode_json decode_json);
 use Test::More qw(no_plan);
 use Poloniex::API;
 
@@ -15,7 +14,11 @@ BEGIN {
     use_ok('Poloniex::API');
     eval { use Test::MockObject; 1 }
       || plan skip_all => 'Poloniex::API required for this test!';
+    eval { use JSON::XS; 1 } 
+      || plan skip_all => 'JSON::XS not installet!';
 }
+
+$ENV{DEBUG_API_POLONIEX} = 1;
 
 my @test = (
     {
@@ -83,12 +86,6 @@ my @test = (
         method       => 'returnLoanOrders',
         request_args => { currency => 'BTC' }
     },
-    # fail
-    {
-        agent => \&lwp_mock,
-        resp => { result => '{"error":"error message"}' },
-        method => 'fail'
-    }
 );
 
 my $api = Poloniex::API->new(
@@ -107,7 +104,8 @@ foreach my $test (@test) {
     my $mock_tester = sub {
         my $return_value = shift;
 
-        is_deeply $return_value, decode_json($test->{resp}->{result}),
+        is_deeply $return_value,
+          JSON::XS->new->decode( $test->{resp}->{result} ),
           "return value of '$method' is as expected";
     };
     note("running tests for $test->{method}");
