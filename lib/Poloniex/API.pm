@@ -96,10 +96,10 @@ sub api_public {
 
 sub parse_error {
     my ( $self, $msg ) = @ARG;
-    my $error = { type => 'unknown', $msg => $msg || $EVAL_ERROR };
+    my $error = { type => 'unknown', msg => $msg };
 
     return
-      unless $error->{msg} =~ m/"error":"(?<MSG_ERROR>[^"]*)"/;
+      unless $error->{msg} =~ m{ "error":"(?<MSG_ERROR>[^"]*)" }xg;
 
     $self->{msg}  = $LAST_PAREN_MATCH{MSG_ERROR};
     $self->{type} = 'api';
