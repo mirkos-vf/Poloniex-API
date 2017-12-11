@@ -20,5 +20,5 @@ api_trading	blib/lib/Poloniex/API.pm	48;"	s
 api_trading	lib/Poloniex/API.pm	48;"	s
 new	blib/lib/Poloniex/API.pm	36;"	s
 new	lib/Poloniex/API.pm	36;"	s
-parse_error	blib/lib/Poloniex/API.pm	95;"	s
+parse_error	blib/lib/Poloniex/API.pm	97;"	s
 parse_error	lib/Poloniex/API.pm	97;"	s
