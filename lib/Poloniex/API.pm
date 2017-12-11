@@ -94,13 +94,6 @@ sub api_public {
     }
 }
 
-=head1 parse_error
-
-    method parse_error return vakue undef
-    if not error
-
-=cut
-
 sub parse_error {
     my ( $self, $msg ) = @ARG;
     my $error = { type => 'unknown', $msg => $msg || $EVAL_ERROR };
@@ -108,9 +101,8 @@ sub parse_error {
     return
       unless $error->{msg} =~ m/"error":"(?<MSG_ERROR>[^"]*)"/;
 
-    $self->{msg} = $LAST_PAREN_MATCH{MSG_ERROR};
+    $self->{msg}  = $LAST_PAREN_MATCH{MSG_ERROR};
     $self->{type} = 'api';
-
 }
 
 sub _retrieve_json {
@@ -127,8 +119,6 @@ sub _croak {
 1;
 
 __END__
-
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
@@ -152,7 +142,8 @@ __END__
 =head2 new
 
     my $iterator = Poloniex::API->new(%hash);
-    Return a Poloniex::API for C<hash>
+
+Creates a new L<Poloniex::API> instance.
 
 =head1 METHODS
 
@@ -163,14 +154,12 @@ __END__
 =head2 api_trading
 
     my $returnCompleteBalances = $api->api_trading('returnCompleteBalances');
-    my ($returnTradeHistory, $err) = $api->api_trading('returnTradeHistory', {
+    $api->api_trading('returnTradeHistory', {
         currencyPair => 'BTC_ZEC'
     });
 
-    if ($err) {
-        say $returnTradeHistory->{error};
-    }
-TODO: this description function
+This method performs a query on a private API. The request uses the api key and the secret key
+(L<here's a list|https://poloniex.com/support/api/>).
 
 =head2 api_public
 
@@ -182,7 +171,17 @@ TODO: this description function
 		end          => 9999999999,
 		period       => 14400
 	});
-TODO: this description function
+
+This method performs an API request. The first argument must be the method name
+(L<here's a list|https://poloniex.com/support/api/>).
+
+=head2 parse_error
+
+    $result = $api->api_public('fake', { map { $_ => $_ } 'a'..'d' })
+
+    if (!$result) {
+        say sprintf('%s: %s', $api->{type}, $api->{msg});
+    }
 
 =head1 AUTHOR
 
