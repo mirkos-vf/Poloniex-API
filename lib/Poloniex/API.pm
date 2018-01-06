@@ -17,10 +17,10 @@ use constant {
 
 BEGIN {
     eval { require LWP::UserAgent, 1; }
-      || _croak('LWP::UserAgent package not found');
+      || die('LWP::UserAgent package not found');
 
     eval { require JSON::XS, 1; }
-      || _croak('JSON::XS package not found');
+      || die('JSON::XS package not found');
 }
 our $VERSION = '0.03';
 
