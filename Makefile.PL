@@ -22,7 +22,13 @@ WriteMakefile(
           qw(JSON::XS Test::MockObject HTTP::Request Digest::SHA Test::Perl::Critic Test::Pod Test::PerlTidy),
     },
     META_MERGE => {
-        requires  => { perl => '5.008008' },
+        test_requires => {
+            'Test::More'         => 0,
+            'Test::MockObject'   => 0,
+            'Test::Perl::Critic' => 0,
+            'Test::Pod'          => 0,
+            'Test::PerlTidy'     => 0,
+        },
         resources => {
             license    => 'http://dev.perl.org/licenses/',
             repository => 'https://github.com/mirkos-vf/Poloniex-API',
