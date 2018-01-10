@@ -26,7 +26,7 @@ our $VERSION = '0.03';
 
 # singleton and accessor
 {
-    my $lwp = LWP::UserAgent->new();
+    my $lwp = LWP::UserAgent->new( keep_alive => 1 );
     sub _lwp_agent { return $lwp }
 
     my $json = JSON::XS->new();
