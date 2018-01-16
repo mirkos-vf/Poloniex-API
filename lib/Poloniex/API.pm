@@ -184,11 +184,18 @@ This method performs an API request. The first argument must be the method name
 
 =head2 parse_error
 
-    $result = $api->api_public('fake', { map { $_ => $_ } 'a'..'d' })
+    handle_api_error($api, $api->api_public('fake'))
 
-    if (!$result) {
-        say sprintf('%s: %s', $api->{type}, $api->{msg});
+    sub handle_api_error {
+        my ( $api, $retval ) = @_;
+        unless ( $retval ) {
+            die sprintf("Error: %s; type: %s", $api->{msg}, $mapi->{type});
+        }
     }
+
+=head2 
+
+
 
 =head1 AUTHOR
 
