@@ -170,14 +170,14 @@ This method performs a query on a private API. The request uses the api key and 
 
 =head2 api_public
 
-	my $Ticker = $api->api_public('returnTicker');
-	
-	my $ChartData    = $api->api_public('returnChartData', {
-		currencyPair => 'BTC_XMR',
-		start        => 1405699200,
-		end          => 9999999999,
-		period       => 14400
-	});
+    my $Ticker = $api->api_public('returnTicker');
+
+    my $ChartData    = $api->api_public('returnChartData', {
+        currencyPair => 'BTC_XMR',
+        start        => 1405699200,
+        end          => 9999999999,
+        period       => 14400
+    });
 
 This method performs an API request. The first argument must be the method name
 (L<here's a list|https://poloniex.com/support/api/>).
