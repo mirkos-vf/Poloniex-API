@@ -23,7 +23,8 @@ WriteMakefile(
     },
     META_MERGE => {
         test_requires => {
-            map { $_ => 0 } qw(Test::More Test::MockObject Test::Perl::Critic Test::Pod Test::PerlTidy),
+            map { $_ => 0 }
+              qw(Test::More Test::MockObject Test::Perl::Critic Test::Pod Test::PerlTidy),
         },
         resources => {
             license    => 'http://dev.perl.org/licenses/',

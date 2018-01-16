@@ -68,8 +68,7 @@ sub api_trading {
     $http->content($param);
     my $respons = $self->{_agent}->request($http);
 
-    my $json = $self->_retrieve_json( $respons->{'_content'} );
-    return $json;
+    $self->checkResponse($respons);
 }
 
 sub api_public {
@@ -84,13 +83,19 @@ sub api_public {
     $params = sprintf "$method&%s", join( '&', @request )
       if (@request);
 
-    my $requst = $self->{_agent}
+    my $respons = $self->{_agent}
       ->post( sprintf( URL_PUBLIC_API, ($params) ? $params : $method ) );
 
-    if (   ( $requst->is_success )
-        && ( !$self->parse_error( $requst->decoded_content ) ) )
+    $self->checkResponse($respons);
+}
+
+sub _checkResponse {
+    my ( $self, $respons ) = @ARG;
+
+    if (   ( $respons->is_success )
+        && ( !$self->parse_error( $respons->decoded_content ) ) )
     {
-        return $json = $self->_retrieve_json( $requst->decoded_content );
+        return $self->_retrieve_json( $respons->decoded_content );
     }
 }
 
@@ -99,10 +104,12 @@ sub parse_error {
     my $error = { type => 'unknown', msg => $msg };
 
     return
-      unless $error->{msg} =~ m{ "error":"(?<MSG_ERROR>[^"]*)" }xg;
+      unless $error->{msg} =~ m/error":"([^"]*)/;
 
-    $self->{msg}  = $LAST_PAREN_MATCH{MSG_ERROR};
+    $self->{msg}  = $1;
     $self->{type} = 'api';
+
+    return 1;
 }
 
 sub _retrieve_json {
