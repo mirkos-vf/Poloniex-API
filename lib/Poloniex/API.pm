@@ -68,7 +68,7 @@ sub api_trading {
     $http->content($param);
     my $respons = $self->{_agent}->request($http);
 
-    $self->checkResponse($respons);
+    $self->_checkResponse($respons);
 }
 
 sub api_public {
@@ -86,7 +86,7 @@ sub api_public {
     my $respons = $self->{_agent}
       ->post( sprintf( URL_PUBLIC_API, ($params) ? $params : $method ) );
 
-    $self->checkResponse($respons);
+    $self->_checkResponse($respons);
 }
 
 sub _checkResponse {
