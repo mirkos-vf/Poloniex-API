@@ -193,20 +193,16 @@ This method performs an API request. The first argument must be the method name
         }
     }
 
-=head2 
-
-
-
 =head1 AUTHOR
 
-vlad mirkos, E<lt>vladmirkos@sd.apple.com<gt>
+    vlad mirkos, E<lt>vladmirkos@sd.apple.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by vlad mirkos
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.18.2 or,
-at your option, any later version of Perl 5 you may have available.
+    Copyright (C) 2017 by vlad mirkos
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself, either Perl version 5.18.2 or,
+    at your option, any later version of Perl 5 you may have available.
 
 =encoding UTF-8
 
